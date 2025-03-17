@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unauthorized</title>
+    <link rel="stylesheet" href="/proxyauth/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+                <svg class="bi me-2" width="40" height="32">
+                    <use xlink:href="#bootstrap"></use>
+                </svg>
+                <span class="fs-4">🔒&nbsp;</span> <span class="fs-4" id="header-title">Advanced Proxy Auth</span>
+            </a>
+        </header>
+
+        <!-- Content -->
+        <div class="container">
+            <!-- New user form -->
+            <div class="container">
+                <form class="row g-3" action="/proxyauth/admin/users" method="POST">
+                    <div class="col-md-6">
+                        <label for="inputUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="inputUsername" name="username" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="inputPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="inputPassword" name="password" required>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Create user</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- New user script -->
+            <script>
+                const form = document.querySelector('form');
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    console.log(formData);
+                    fetch('/proxyauth-admin-api/users', {
+                        method: 'POST',
+                        body: JSON.stringify(Object.fromEntries(formData)),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                });
+            </script>
+
+            <!-- Users table -->
+            <div class="container mt-5 mb-5">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Username</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table"> </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User table script -->
+        <script>
+            window.deleteUser = (id) => {
+                fetch(`/proxyauth-admin-api/users/${id}`, {
+                    method: 'DELETE'
+                }).then(() => {
+                    window.location.reload();
+                });
+            };
+
+            const usersTable = document.getElementById('users-table');
+            const users = fetch('/proxyauth-admin-api/users')
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(user => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${user.username}</td>
+                            <td>
+                                <a class="btn btn-primary">Edit</a>
+                                <a class="btn btn-danger" onclick="deleteUser(${user.id})">Delete</a>
+                            </td>
+                        `;
+                        usersTable.appendChild(tr);
+                    });
+                });
+        </script>
+
+        <!-- Footer -->
+        <div class="container">
+            <footer class="row row-cols-1 row-cols-sm-1 row-cols-md-3 py-5 my-5 border-top">
+                <div class="col mb-3">
+                    <span href="/" class="d-flex align-items-center mb-3 ">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                            <path d="M2.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C3.25 2 2.49 2.759 2.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6M13.886 7.9v.163c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456V7.332c-1.114 0-1.49-.362-1.49-1.456V4.352C13.51 2.759 12.75 2 11.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6"/>
+                        </svg>
+                        <span class="ms-1">Powered by </span><a href="https://github.com/Wiredista/launchpad" class="link-body-emphasis text-decoration-none ms-1">Advanced Proxy Auth</a>
+                    </span>
+                    <p class="text-body-secondary">
+                        Developed by <a href="https://kasparyan.tec.br/" class="link-body-emphasis text-decoration-none">Kasparyan Technologies</a>. <br>
+                        Licensed under <a href="https://opensource.org/license/mit" class="link-body-emphasis text-decoration-none">MIT Open Source License</a>. <br>
+                        Code available on <a href="https://github.com/Wiredista/launchpad" class="link-body-emphasis text-decoration-none">GitHub</a>. <br>
+                    </p>
+                </div>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>
