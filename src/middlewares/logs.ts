@@ -6,8 +6,8 @@ const db = sqlite.open('db.sqlite')
 db.exec(`
     CREATE TABLE IF NOT EXISTS access_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL,
-        ip TEXT NOT NULL,
+        username TEXT,
+        ip TEXT,
         timestamp TEXT NOT NULL
     )
     `)
@@ -33,8 +33,6 @@ export const logsMiddleware = (req: Request, res: Response, next: NextFunction) 
         recentActivity[ip] > new Date(Date.now() - 1000 * 60 * 5)
     ) return; 
 
-    const log = `IP: ${ip} - Timestamp: ${time.toISOString()}`;
-    console.log(log);
     recentActivity[ip] = time;
     db.prepare('INSERT INTO access_logs (ip, timestamp, username) VALUES (?, ?, ?)').run(ip, time.toISOString(), res.locals.username);
 }
@@ -43,6 +41,7 @@ export const accessLogsRoute = (req: Request, res: Response) => {
     if(res.locals.isAdmin) {
         const logs = db.query('SELECT * FROM access_logs').all();
         res.json(logs);
+        return;
     }
 
     res.status(401).sendFile(path.resolve(__dirname, '../../public/error/401.html'));
