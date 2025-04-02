@@ -2,8 +2,15 @@ import { env } from 'bun';
 import express, { type Request, type Response, type NextFunction } from 'express';
 import proxy from 'express-http-proxy';
 import { logsMiddleware, accessLogsRoute } from './middlewares/logs';
+import next from 'next';
+
+const isDevelopment = env.NODE_ENV !== 'production';
 
 const app = express();
+const nextApp = next({ dev: isDevelopment });
+
+const handle = nextApp.getRequestHandler() as any;
+await nextApp.prepare();
 
 // PROXY CONFIG
 const PROXY_HOST = env.PROXY_HOST || 'app';
@@ -12,7 +19,9 @@ const PROXY_PROTOCOL = env.PROXY_PROTOCOL || 'http';
 
 const PROXY_URL = `${PROXY_PROTOCOL}://${PROXY_HOST}:${PROXY_PORT}`;
 
-app.use('/proxyauth', express.static('public'));
+app.all('/proxyauth*', (req: Request, res: Response) => {
+    return handle(req, res);
+});
 
 // AUTHENTICATION MODES
 const AUTH_MODE = env.AUTH_MODE || 'none';

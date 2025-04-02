@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     // Enable latest features
-    "lib": ["ESNext", "DOM"],
-    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "dom.iterable"], // Merged and deduplicated
+    "target": "ESNext", // Updated to match the latest
     "module": "ESNext",
     "moduleDetection": "force",
-    "jsx": "react-jsx",
+    "jsx": "preserve", // Updated to match the provided config
     "allowJs": true,
 
     // Bundler mode
@@ -22,6 +22,22 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
-  }
+    "noPropertyAccessFromIndexSignature": false,
+
+    // Additional options from the provided config
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"], // Added from the provided config
+  "exclude": ["node_modules"] // Added from the provided config
 }
