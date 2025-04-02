@@ -33,12 +33,12 @@ export const httpWebUIAuthMiddleware = (req: Request, res: Response, next: NextF
         return next();
     }
 
-    res.redirect('/proxyauth-login?redirectURL=' + encodeURIComponent(req.originalUrl));
+    res.redirect(`/proxyauth?redirect=${encodeURIComponent(req.originalUrl)}`);
 }
 
 export const httpWebUIAuthAdminMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (res.locals.isAdmin) return next();
-    res.redirect('/proxyauth-login?redirectURL=' + encodeURIComponent(req.originalUrl));
+    res.redirect(`/proxyauth?redirect=${encodeURIComponent(req.originalUrl)}`);
 }
 
 export const loginRoute = (req: Request, res: Response) => {
@@ -61,7 +61,7 @@ export const loginRoute = (req: Request, res: Response) => {
 
     const userData = db.query('SELECT * FROM users WHERE username = ?').get(username) as Record<string, any>;
     if (!userData) {
-        res.redirect('/proxyauth-login?redirectURL=' + encodeURIComponent(redirectURL) + '&error=401');
+        res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
         return;
     }
 
@@ -73,6 +73,6 @@ export const loginRoute = (req: Request, res: Response) => {
         return;
     }
     
-    res.redirect('/proxyauth-login?redirectURL=' + encodeURIComponent(String(redirectURL)) + '&error=401');
+    res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
     return;
 }

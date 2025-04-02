@@ -1,7 +1,6 @@
 {
   "name": "proxy-auth",
   "module": "src/index.ts",
-  "type": "module",
   "scripts": {
     "dev": "bun run src/index.ts",
     "build": "next build",

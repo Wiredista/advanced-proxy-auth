@@ -26,7 +26,7 @@ export const httpAdvancedAuthMiddleware = (req: Request, res: Response, next: Ne
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-        return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+        return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
     }
 
     const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString();
@@ -45,13 +45,13 @@ export const httpAdvancedAuthMiddleware = (req: Request, res: Response, next: Ne
 
     if (!user || !pass) { // No user or password
         res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-        return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+        return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
     }
 
     const userData = db.query('SELECT * FROM users WHERE username = ?').get(user) as Record<string, any>;
     if (!userData) { // User not found
         res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-        return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+        return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
     }
         
     if (user && Bun.password.verifySync(pass, userData.password)) { // User and password match
@@ -64,10 +64,10 @@ export const httpAdvancedAuthMiddleware = (req: Request, res: Response, next: Ne
     
     
     res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-    return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+    return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
 }
 
 export const httpAdvancedAuthAdminMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (res.locals.isAdmin) return next();
-    return res.status(403).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+    return res.redirect(`/proxyauth/error?error=403&redirect=${encodeURIComponent(req.originalUrl)}`);
 }
