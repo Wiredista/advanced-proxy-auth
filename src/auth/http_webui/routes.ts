@@ -50,9 +50,4 @@ router.delete('/users/:id', (req, res) => {
     res.status(204).send();
 });
 
-router.get('/am-i-admin', (req, res) => {
-    if (res.locals.isAdmin) res.status(200).send('Yes, you are an admin');
-    else res.status(403).send('No, you are not an admin');
-});
-
 export default router;

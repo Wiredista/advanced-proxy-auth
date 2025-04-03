@@ -5,6 +5,10 @@ import path from 'path';
 
 export const router = Router();
 
+router.get('/api-proxyauth-admin/am-i-admin', (req, res) => {
+    if (res.locals.isAdmin) res.status(200).send('Yes, you are an admin');
+    else res.status(403).send('No, you are not an admin');
+});
 router.post('/api-proxyauth-login', express.urlencoded({ extended: true }), express.json(), loginRoute);
 router.use('/api-proxyauth-admin', httpWebUIAuthMiddleware, httpWebUIAuthAdminMiddleware, adminRoutes);
 
