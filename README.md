@@ -49,20 +49,23 @@ PROXY_HOST=127.0.0.1
 PROXY_PORT=80
 PROXY_PROTOCOL=http
 
-# AUTHENTICATION - HTTP_BASIC
-AUTH_MODE=http
-AUTH_HTTP_USERNAME=admin
-AUTH_HTTP_PASSWORD=admin
+LOG_ACCESS=true
 
-# AUTHENTICATION - HTTP_ADVANCED
-# AUTH_MODE=http_advanced
+## AUTHENTICATION - WEB UI
+# AUTH_MODE=http_webui
 # AUTH_HTTP_USERNAME=admin # username for the admin UI
 # AUTH_HTTP_PASSWORD=admin # password for the admin UI
 
-# AUTHENTICATION - WEB UI
-# AUTH_MODE=web_ui
-# AUTH_HTTP_USERNAME=admin # username for the admin UI
-# AUTH_HTTP_PASSWORD=admin # password for the admin UI
+## AUTHENTICATION - LDAP
+# AUTH_MODE=ldap
+# LDAP_URL=ldap://ldap.internal
+# LDAP_BIND_DN=cn=admin,dc=example,dc=com
+# LDAP_BIND_PASSWORD=admin
+# LDAP_SEARCH_BASE=dc=example,dc=com
+# LDAP_SEARCH_FILTER=(uid=%s)
+# LDAP_SEARCH_ATTRIBUTE=uid
+# LDAP_SEARCH_SCOPE=sub
+# LDAP_IGNORE_CERTIFICATE_ERRORS=false
 ```
 
 Create a `docker-compose.yml`
@@ -86,19 +89,14 @@ Since SSL/TLS is not implemented yet, you can use a reverse proxy like [Nginx Pr
 
 ## 📖 Usage
 
-After running the project, you can access the admin UI on `http://localhost:3000/proxyauth-admin`.
-
-Access logs are available on `http://localhost:3000/proxyauth/logs` if you are logged in as an admin.
+After running the project, you can access the admin UI on `http://localhost:3000/proxyauth/admin`.
 
 The default username and password are `admin`.
 
 All other requests will be redirected to the destination URL configured in the `.env` file.
 
 Currently supported authentication methods are:
-- **HTTP Basic Authentication:** HTTP based username and password authentication configured in the `.env` file.
-- **HTTP Advanced Authentication:** HTTP based username and password authentication with a WebUI to manage users.
 - **WebUI Authentication:** WebUI based username and password authentication with a WebUI to manage users.
-
 
 ## 📚 Contributing
 
