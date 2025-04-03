@@ -38,8 +38,8 @@ export const httpAdvancedAuthMiddleware = (req: Request, res: Response, next: Ne
         return next();
     }
 
-    const session = req.headers.cookie?.split(';').find((c) => c.includes('session'))?.split('=')[1];
-    if(session && sessions.get(user) === session) {
+    const proxyauth_session = req.headers.cookie?.split(';').find((c) => c.includes('proxyauth_session'))?.split('=')[1];
+    if(proxyauth_session && sessions.get(user) === proxyauth_session) {
         return next();
     }
 
@@ -58,7 +58,7 @@ export const httpAdvancedAuthMiddleware = (req: Request, res: Response, next: Ne
         const token = crypto.randomBytes(16).toString('hex');
         sessions.set(user, token);
 
-        res.cookie('session', token, { httpOnly: true });
+        res.cookie('proxyauth_session', token, { httpOnly: true });
         return next();
     }
     

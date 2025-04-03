@@ -23,9 +23,9 @@ if (AUTH_HTTP_USER === 'admin' && AUTH_HTTP_PASS === 'admin') {
 const sessions = new Map<string, string>();
 
 export const httpWebUIAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const session = req.headers.cookie?.split(';').find((c) => c.includes('session'))?.split('=')[1];
-    if(session && sessions.get(session)) {
-        res.locals.username = sessions.get(session);
+    const proxyauth_session = req.headers.cookie?.split(';').find((c) => c.includes('proxyauth_session'))?.split('=')[1];
+    if(proxyauth_session && sessions.get(proxyauth_session)) {
+        res.locals.username = sessions.get(proxyauth_session);
 
         if (res.locals.username === AUTH_HTTP_USER)
             res.locals.isAdmin = true;
@@ -54,7 +54,7 @@ export const loginRoute = (req: Request, res: Response) => {
         res.locals.isAdmin = true;
         const token = crypto.randomBytes(16).toString('hex');
         sessions.set(token, username);
-        res.cookie('session', token, { httpOnly: true });
+        res.cookie('proxyauth_session', token, { httpOnly: true });
         res.status(200).send('OK');
         return;
     }
@@ -68,7 +68,7 @@ export const loginRoute = (req: Request, res: Response) => {
     if (username && Bun.password.verifySync(password, userData.password)) {
         const token = crypto.randomBytes(16).toString('hex');
         sessions.set(token, username);
-        res.cookie('session', token, { httpOnly: true });
+        res.cookie('proxyauth_session', token, { httpOnly: true });
         res.status(200).send('OK');
         return;
     }
