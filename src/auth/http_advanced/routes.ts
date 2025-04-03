@@ -19,13 +19,13 @@ router.use(express.json());
 
 // CRUD operations for users
 router.get('/users', (req, res) => {
-    const users = db.query('SELECT * FROM users').all();
+    const users = db.query('SELECT id, username, name, created_at FROM users').all();
     res.json(users);
 });
 
 router.get('/users/:id', (req, res) => {
     const { id } = req.params;
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+    const user = db.prepare('SELECT id, username, name, created_at FROM users WHERE id = ?').get(id);
     if (!user) {
         res.status(404).send('User not found');
         return;
