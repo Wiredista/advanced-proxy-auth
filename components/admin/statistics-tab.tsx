@@ -1,6 +1,7 @@
 import { Clock } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react"
 
 // Mock data - in a real app, this would come from your API
 const statisticsData = {
@@ -17,6 +18,8 @@ const statisticsData = {
 }
 
 export default function StatisticsTab() {
+  const [statistics, setStatistics] = useState(statisticsData)
+
   return (
     <div className="space-y-6">
       <div>
@@ -42,17 +45,17 @@ export default function StatisticsTab() {
           <div className="grid gap-4 md:grid-cols-3">
             <StatCard
               title="Total Requests"
-              value={statisticsData.last24h.requestCount.toLocaleString()}
+              value={statistics.last24h.requestCount.toLocaleString()}
               description="Total requests in the last 24 hours"
             />
             <StatCard
               title="Unique Visitors"
-              value={statisticsData.last24h.uniqueVisitors.toLocaleString()}
+              value={statistics.last24h.uniqueVisitors.toLocaleString()}
               description="Distinct users in the last 24 hours"
             />
             <StatCard
               title="Failed Authentications"
-              value={statisticsData.last24h.failedAuthentications.toLocaleString()}
+              value={statistics.last24h.failedAuthentications.toLocaleString()}
               description="Authentication failures in the last 24 hours"
               isNegative
             />
