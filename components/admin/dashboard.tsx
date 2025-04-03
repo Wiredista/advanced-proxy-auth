@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BarChart3, Cog, FileText, Home, LogOut, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,6 +21,15 @@ import SettingsTab from "@/components/admin/settings-tab"
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("statistics")
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const response = await fetch('/api-proxyauth-admin/am-i-admin')
+      const isAuthenticated = response.ok
+      if (!isAuthenticated) window.location.href = '/proxyauth/error?error=403&redirect=/proxyauth/admin'
+    }
+    checkAdmin()
+  }, [])
 
   return (
     <SidebarProvider>
