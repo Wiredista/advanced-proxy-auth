@@ -10,6 +10,6 @@ router.get('/api-proxyauth-admin/am-i-admin', (req, res) => {
     else res.status(403).send('No, you are not an admin');
 });
 router.post('/api-proxyauth-login', express.urlencoded({ extended: true }), express.json(), loginRoute);
-router.use('/api-proxyauth-admin', httpWebUIAuthMiddleware, httpWebUIAuthAdminMiddleware, adminRoutes);
+router.use('/api-proxyauth-admin', express.urlencoded({ extended: true }), express.json(), httpWebUIAuthMiddleware, httpWebUIAuthAdminMiddleware, adminRoutes);
 
 export default router;
