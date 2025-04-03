@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { format } from "date-fns"
 import { Trash, AlertTriangle, Info } from 'lucide-react'
 
@@ -27,83 +27,43 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-// Mock data - in a real app, this would come from your API
-const initialLogs = [
-  {
-    id: "1",
-    username: "johndoe",
-    timestamp: new Date("2023-04-01T14:32:00"),
-    route: "/dashboard",
-  },
-  {
-    id: "2",
-    username: "janesmith",
-    timestamp: new Date("2023-04-01T14:30:00"),
-    route: "/settings",
-  },
-  {
-    id: "3",
-    username: "rjohnson",
-    timestamp: new Date("2023-04-01T14:25:00"),
-    route: "/api/data",
-  },
-  {
-    id: "4",
-    username: "emilyd",
-    timestamp: new Date("2023-04-01T14:20:00"),
-    route: "/users",
-  },
-  {
-    id: "5",
-    username: "mwilson",
-    timestamp: new Date("2023-04-01T14:15:00"),
-    route: "/admin",
-  },
-  {
-    id: "6",
-    username: "johndoe",
-    timestamp: new Date("2023-04-01T14:02:00"),
-    route: "/profile",
-  },
-  {
-    id: "7",
-    username: "guest",
-    timestamp: new Date("2023-04-01T13:55:00"),
-    route: "/login",
-  },
-  {
-    id: "8",
-    username: "admin",
-    timestamp: new Date("2023-04-01T13:45:00"),
-    route: "/admin/settings",
-  },
-  {
-    id: "9",
-    username: "janesmith",
-    timestamp: new Date("2023-04-01T13:30:00"),
-    route: "/api/users",
-  },
-  {
-    id: "10",
-    username: "system",
-    timestamp: new Date("2023-04-01T13:00:00"),
-    route: "/api/health",
-  },
-]
-
 type Log = {
   id: string
   username: string
+  ip: string
   timestamp: Date
-  route: string
 }
 
 export default function LogsTab() {
-  const [logs, setLogs] = useState<Log[]>(initialLogs)
+  const [logs, setLogs] = useState<Log[]>([])
+
+  useEffect(() => {
+    // Placeholder fetch to get logs from the API
+    async function fetchLogs() {
+      try {
+        const response = await fetch("/api-proxyauth-admin/logs")
+        const data = await response.json()
+        setLogs(data)
+      } catch (error) {
+        console.error("Failed to fetch logs:", error)
+      }
+    }
+
+    fetchLogs()
+  }, [])
 
   const handleClearLogs = () => {
-    // In a real app, you would call your API here
-    setLogs([])
+    fetch("/api-proxyauth-admin/logs", { method: "DELETE" })
+      .then((response) => {
+        if (response.ok) {
+          setLogs([])
+        } else {
+          console.error("Failed to clear logs")
+        }
+      })
+      .catch((error) => {
+        console.error("Error clearing logs:", error)
+      })
   }
 
   return (
@@ -147,7 +107,7 @@ export default function LogsTab() {
         <Info className="h-4 w-4" />
         <AlertTitle>Logging Information</AlertTitle>
         <AlertDescription>
-          To prevent excessive log entries, each user's activity is logged at most once every 5 minutes per route.
+          To prevent excessive log entries, each user's activity is logged at most once every 5 minutes.
         </AlertDescription>
       </Alert>
       
@@ -164,16 +124,16 @@ export default function LogsTab() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Username</TableHead>
+                  <TableHead>IP Address</TableHead>
                   <TableHead>Date and Time</TableHead>
-                  <TableHead>Route</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {logs.map((log) => (
                   <TableRow key={log.id}>
                     <TableCell className="font-medium">{log.username}</TableCell>
-                    <TableCell>{format(log.timestamp, "MMM d, yyyy h:mm:ss a")}</TableCell>
-                    <TableCell>{log.route}</TableCell>
+                    <TableCell>{log.ip}</TableCell>
+                    <TableCell>{(new Date(log.timestamp)).toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
