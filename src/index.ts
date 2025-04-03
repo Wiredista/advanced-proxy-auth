@@ -59,6 +59,7 @@ app.get('/api-proxyauth-admin/settings', (req: Request, res: Response) => {
         proxyPort: PROXY_PORT,
         proxyProtocol: PROXY_PROTOCOL,
         proxyUrl: PROXY_URL,
+        logAccess: env.LOG_ACCESS=="1" || env.LOG_ACCESS?.toLowerCase()=="true",
     });
 });
 
