@@ -28,7 +28,6 @@ export const logsMiddleware = (req: Request, res: Response, next: NextFunction) 
     next();
 
     if(!ip) return;
-    console.log(`IP: ${ip} - ${req.method} ${req.originalUrl} - ${res.statusCode} - ${res.locals.username}`);
     if(
         recentActivity[ip] && 
         recentActivity[ip] > new Date(Date.now() - 1000 * 60 * 5)
