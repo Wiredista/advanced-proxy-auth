@@ -2,22 +2,15 @@
 
 Advanced Proxy Auth is a tool that allows you to create an simple reverse proxy with authentication. It is useful when you want to protect your unsecured services with a simple password.
 
-📣 The project is still in development and features are not all implemented yet.
-
 ## 🪶 Features
 
-✅ **Implemented:**
-- Single user HTTP Authentication
-- Multiple user HTTP Authentication
 - WebUI based authentication
 - User management
 - Access logs
 
 🛠️ **Planned:**
 - LDAP Authentication
-- OAuth2 Authentication
 - SSL/TLS support
-- Better admin UI and tools
 
 ## 🚀 Running
 
