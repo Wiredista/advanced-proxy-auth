@@ -1,12 +1,12 @@
 import express, { Router } from 'express';
 import adminRoutes from './routes';
-import { httpWebUIAuthAdminMiddleware, httpWebUIAuthMiddleware, loginRoute } from './middleware';
+import { httpWebUIAuthAdminMiddleware, httpWebUIAuthMiddleware, isAdmin, loginRoute } from './middleware';
 import path from 'path';
 
 export const router = Router();
 
 router.get('/api-proxyauth-admin/am-i-admin', (req, res) => {
-    if (res.locals.isAdmin) res.status(200).send('Yes, you are an admin');
+    if (isAdmin(req)) res.status(200).send('Yes, you are an admin');
     else res.status(403).send('No, you are not an admin');
 });
 router.post('/api-proxyauth-login', express.urlencoded({ extended: true }), express.json(), loginRoute);

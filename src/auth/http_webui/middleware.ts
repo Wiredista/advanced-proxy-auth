@@ -22,6 +22,15 @@ if (AUTH_HTTP_USER === 'admin' && AUTH_HTTP_PASS === 'admin') {
 
 const sessions = new Map<string, string>();
 
+export function isAdmin(req: Request) {
+    const proxyauth_session = req.headers.cookie?.split(';').find((c) => c.includes('proxyauth_session'))?.split('=')[1];
+    if(!proxyauth_session) return false;
+
+    const sessionUser = sessions.get(proxyauth_session);
+    if (!sessionUser) return false;
+    return sessionUser === AUTH_HTTP_USER;
+}
+
 export const httpWebUIAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const proxyauth_session = req.headers.cookie?.split(';').find((c) => c.includes('proxyauth_session'))?.split('=')[1];
     if(proxyauth_session && sessions.get(proxyauth_session)) {

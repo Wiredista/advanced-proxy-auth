@@ -22,6 +22,17 @@ if (AUTH_HTTP_USER === 'admin' && AUTH_HTTP_PASS === 'admin') {
 
 const sessions = new Map<string, string>();
 
+export function isAdmin(req: Request) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return false;
+
+    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString();
+    const [user, pass] = auth.split(':');
+
+    // Admin user
+    return user === AUTH_HTTP_USER && pass === AUTH_HTTP_PASS
+}
+
 export const httpAdvancedAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
