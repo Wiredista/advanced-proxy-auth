@@ -65,6 +65,9 @@ export default function UserManagementTab() {
         username: formData.username,
         password: formData.password,
       }),
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
 
     if (!response.ok) {
