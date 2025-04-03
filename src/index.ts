@@ -27,23 +27,23 @@ app.all('/proxyauth*', (req: Request, res: Response) => {
 const AUTH_MODE = env.AUTH_MODE || 'none';
 
 if (AUTH_MODE === 'http') { 
-    const { httpAuthMiddleware } = require('./auth/http');
+    const { httpAuthMiddleware } = require('./src/auth/http');
     app.use(httpAuthMiddleware);
 }
 
 if (AUTH_MODE === 'http_advanced') {
-    const { router } = require('./auth/http_advanced');
+    const { router } = require('./src/auth/http_advanced');
     app.use(router);
 
-    const { httpAdvancedAuthMiddleware } = require('./auth/http_advanced/middleware');
+    const { httpAdvancedAuthMiddleware } = require('./src/auth/http_advanced/middleware');
     app.use(httpAdvancedAuthMiddleware);
 }
 
 if (AUTH_MODE === 'http_webui') {
-    const { router } = require('./auth/http_webui');
+    const { router } = require('./src/auth/http_webui');
     app.use(router);
 
-    const { httpWebUIAuthMiddleware } = require('./auth/http_webui/middleware');
+    const { httpWebUIAuthMiddleware } = require('./src/auth/http_webui/middleware');
     app.use(httpWebUIAuthMiddleware);
 }
 
