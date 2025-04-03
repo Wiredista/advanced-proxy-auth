@@ -55,13 +55,13 @@ export const loginRoute = (req: Request, res: Response) => {
         const token = crypto.randomBytes(16).toString('hex');
         sessions.set(token, username);
         res.cookie('session', token, { httpOnly: true });
-        res.redirect(String(redirectURL) || '/');
+        res.status(200).send('OK');
         return;
     }
 
     const userData = db.query('SELECT * FROM users WHERE username = ?').get(username) as Record<string, any>;
     if (!userData) {
-        res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
+        res.status(401).send('Unauthorized');
         return;
     }
 
@@ -69,10 +69,10 @@ export const loginRoute = (req: Request, res: Response) => {
         const token = crypto.randomBytes(16).toString('hex');
         sessions.set(token, username);
         res.cookie('session', token, { httpOnly: true });
-        res.redirect(String(redirectURL) || '/');
+        res.status(200).send('OK');
         return;
     }
     
-    res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
+    res.status(401).send('Unauthorized');
     return;
 }

@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import Link from "next/link"
 import { Eye, EyeOff, Github, Mail } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -23,21 +22,42 @@ export default function LoginForm() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate authentication process
     try {
       const formData = new FormData(e.currentTarget)
       const username = formData.get("username")
       const password = formData.get("password")
 
-      console.log("Login attempt:", { username, password })
+      // Redirect URL 
+      const redirectURL = new URLSearchParams(window.location.search).get("redirect") || "/"
+      if (!username || !password) {
+        alert("Please enter both username and password.")
+      }
 
       // Here you would typically call your authentication API
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await fetch("/api-proxyauth-login", {
+        method: "POST",
+        body: JSON.stringify({ username, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
 
-      // Handle successful login
-      console.log("Login successful")
+      // Handle successful API call
+      if(response.status === 200) {
+        console.log("Redirecting to:", redirectURL)
+        window.location.href = redirectURL
+      }
+
+      // Handle error responses
+      if (response.status >= 400) {
+        const errorCode = response.status
+        const redirectTo = `/proxyauth/error?error=${errorCode}&redirect=${encodeURIComponent(redirectURL)}`
+        console.log("Redirecting to:", redirectTo)
+        window.location.href = redirectTo
+      }
     } catch (error) {
-      console.error("Login failed:", error)
+      console.log("Login error:", error)
+      alert("Login failed due to an error in the authentication process.")
     } finally {
       setIsLoading(false)
     }

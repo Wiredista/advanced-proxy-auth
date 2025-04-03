@@ -56,6 +56,13 @@ export default function ErrorPage() {
     name: "Internal Server Error",
     message: "An unexpected error occurred.",
   })
+  const [redirectPage, setRedirectPage] = useState("/")
+  const redirect = searchParams.get("redirect")
+  const redirectURL = `/?redirect=${encodeURIComponent(redirect || "/")}`
+  
+  useEffect(() => {
+    setRedirectPage(redirectURL)
+  }, [redirectURL])
 
   useEffect(() => {
     const errorCode = searchParams.get("error") || "500"
@@ -91,7 +98,7 @@ export default function ErrorPage() {
           <CardContent className="text-center">
             <p className="mb-6">{errorInfo.message}</p>
             <Button asChild className="w-full">
-              <Link href="/">Return to Login</Link>
+              <Link href={redirectPage}>Return to Login</Link>
             </Button>
           </CardContent>
           <CardFooter className="flex justify-center pt-0">

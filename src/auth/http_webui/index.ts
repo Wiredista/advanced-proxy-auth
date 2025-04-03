@@ -5,7 +5,7 @@ import path from 'path';
 
 export const router = Router();
 
-router.post('/proxyauth-login', express.urlencoded({ extended: true }), loginRoute);
-router.use('/proxyauth-admin-api', httpWebUIAuthMiddleware, httpWebUIAuthAdminMiddleware, adminRoutes);
+router.post('/api-proxyauth-login', express.urlencoded({ extended: true }), express.json(), loginRoute);
+router.use('/api-proxyauth-admin', httpWebUIAuthMiddleware, httpWebUIAuthAdminMiddleware, adminRoutes);
 
 export default router;
