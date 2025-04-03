@@ -6,6 +6,8 @@ db.exec(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
+        name TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         password TEXT NOT NULL
     )
     `)
@@ -32,15 +34,34 @@ router.get('/users/:id', (req, res) => {
 });
 
 router.post('/users', (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) { 
+    const { username, password, name } = req.body;
+    if (!username || !password || !name) { 
         res.status(400).send('Bad Request');
         return;
     }
 
     const hashedPassword = Bun.password.hashSync(password);
-    const user = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)').run(username, hashedPassword);
+    const user = db.prepare('INSERT INTO users (username, password, name) VALUES (?, ?, ?)').run(username, hashedPassword, name);
     res.json(user);
+});
+
+router.put('/users/:id', (req, res) => {
+    const { id } = req.params;
+    const { username, password, name } = req.body;
+
+    if (!username || !name || (password === undefined)) {
+        res.status(400).send('Bad Request');
+        return;
+    }
+
+    const hashedPassword = password ? Bun.password.hashSync(password) : undefined;
+    const updateQuery = `
+        UPDATE users
+        SET username = ?, name = ?, password = COALESCE(?, password)
+        WHERE id = ?
+    `;
+    db.prepare(updateQuery).run(username, name, hashedPassword, id);
+    res.status(200).send('User updated successfully');
 });
 
 router.delete('/users/:id', (req, res) => {
