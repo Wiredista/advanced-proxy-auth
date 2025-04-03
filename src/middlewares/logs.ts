@@ -44,5 +44,15 @@ export const accessLogsRoute = (req: Request, res: Response) => {
         return;
     }
 
-    res.status(401).sendFile(path.resolve(__dirname, '../../public/error/401.html'));
+    res.status(401).send("Unauthorized");
+}
+
+export const clearLogsRoute = (req: Request, res: Response) => {
+    if(res.locals.isAdmin) {
+        db.exec('DELETE FROM access_logs');
+        res.status(200).json({ message: 'Logs cleared successfully' });
+        return;
+    }
+
+    res.status(401).send("Unauthorized");
 }

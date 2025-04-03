@@ -22,10 +22,19 @@ if (AUTH_HTTP_USER === 'admin' && AUTH_HTTP_PASS === 'admin') {
 
 const sessions = new Map<string, string>();
 
+export function isAdmin(req: Request) {
+    const proxyauth_session = req.headers.cookie?.split(';').find((c) => c.includes('proxyauth_session'))?.split('=')[1];
+    if(!proxyauth_session) return false;
+
+    const sessionUser = sessions.get(proxyauth_session);
+    if (!sessionUser) return false;
+    return sessionUser === AUTH_HTTP_USER;
+}
+
 export const httpWebUIAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const session = req.headers.cookie?.split(';').find((c) => c.includes('session'))?.split('=')[1];
-    if(session && sessions.get(session)) {
-        res.locals.username = sessions.get(session);
+    const proxyauth_session = req.headers.cookie?.split(';').find((c) => c.includes('proxyauth_session'))?.split('=')[1];
+    if(proxyauth_session && sessions.get(proxyauth_session)) {
+        res.locals.username = sessions.get(proxyauth_session);
 
         if (res.locals.username === AUTH_HTTP_USER)
             res.locals.isAdmin = true;
@@ -33,12 +42,12 @@ export const httpWebUIAuthMiddleware = (req: Request, res: Response, next: NextF
         return next();
     }
 
-    res.redirect('/proxyauth-login?redirectURL=' + encodeURIComponent(req.originalUrl));
+    res.redirect(`/proxyauth?redirect=${encodeURIComponent(req.originalUrl)}`);
 }
 
 export const httpWebUIAuthAdminMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (res.locals.isAdmin) return next();
-    res.redirect('/proxyauth-login?redirectURL=' + encodeURIComponent(req.originalUrl));
+    res.redirect(`/proxyauth?redirect=${encodeURIComponent(req.originalUrl)}`);
 }
 
 export const loginRoute = (req: Request, res: Response) => {
@@ -54,25 +63,25 @@ export const loginRoute = (req: Request, res: Response) => {
         res.locals.isAdmin = true;
         const token = crypto.randomBytes(16).toString('hex');
         sessions.set(token, username);
-        res.cookie('session', token, { httpOnly: true });
-        res.redirect(String(redirectURL) || '/');
+        res.cookie('proxyauth_session', token, { httpOnly: true });
+        res.status(200).send('OK');
         return;
     }
 
     const userData = db.query('SELECT * FROM users WHERE username = ?').get(username) as Record<string, any>;
     if (!userData) {
-        res.redirect('/proxyauth-login?redirectURL=' + encodeURIComponent(redirectURL) + '&error=401');
+        res.status(401).send('Unauthorized');
         return;
     }
 
     if (username && Bun.password.verifySync(password, userData.password)) {
         const token = crypto.randomBytes(16).toString('hex');
         sessions.set(token, username);
-        res.cookie('session', token, { httpOnly: true });
-        res.redirect(String(redirectURL) || '/');
+        res.cookie('proxyauth_session', token, { httpOnly: true });
+        res.status(200).send('OK');
         return;
     }
     
-    res.redirect('/proxyauth-login?redirectURL=' + encodeURIComponent(String(redirectURL)) + '&error=401');
+    res.status(401).send('Unauthorized');
     return;
 }

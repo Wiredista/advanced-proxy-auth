@@ -13,7 +13,7 @@ export const httpAuthMiddleware = (req: Request, res: Response, next: NextFuncti
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-        return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+        return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
     }
 
     const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString();
@@ -24,5 +24,5 @@ export const httpAuthMiddleware = (req: Request, res: Response, next: NextFuncti
     }
 
     res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-    return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+    return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
 }

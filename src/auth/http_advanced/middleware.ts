@@ -22,11 +22,22 @@ if (AUTH_HTTP_USER === 'admin' && AUTH_HTTP_PASS === 'admin') {
 
 const sessions = new Map<string, string>();
 
+export function isAdmin(req: Request) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return false;
+
+    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString();
+    const [user, pass] = auth.split(':');
+
+    // Admin user
+    return user === AUTH_HTTP_USER && pass === AUTH_HTTP_PASS
+}
+
 export const httpAdvancedAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-        return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+        return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
     }
 
     const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString();
@@ -38,36 +49,36 @@ export const httpAdvancedAuthMiddleware = (req: Request, res: Response, next: Ne
         return next();
     }
 
-    const session = req.headers.cookie?.split(';').find((c) => c.includes('session'))?.split('=')[1];
-    if(session && sessions.get(user) === session) {
+    const proxyauth_session = req.headers.cookie?.split(';').find((c) => c.includes('proxyauth_session'))?.split('=')[1];
+    if(proxyauth_session && sessions.get(user) === proxyauth_session) {
         return next();
     }
 
     if (!user || !pass) { // No user or password
         res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-        return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+        return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
     }
 
     const userData = db.query('SELECT * FROM users WHERE username = ?').get(user) as Record<string, any>;
     if (!userData) { // User not found
         res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-        return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+        return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
     }
         
     if (user && Bun.password.verifySync(pass, userData.password)) { // User and password match
         const token = crypto.randomBytes(16).toString('hex');
         sessions.set(user, token);
 
-        res.cookie('session', token, { httpOnly: true });
+        res.cookie('proxyauth_session', token, { httpOnly: true });
         return next();
     }
     
     
     res.set('WWW-Authenticate', 'Basic realm="Authorization Required"');
-    return res.status(401).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+    return res.redirect(`/proxyauth/error?error=401&redirect=${encodeURIComponent(req.originalUrl)}`);
 }
 
 export const httpAdvancedAuthAdminMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (res.locals.isAdmin) return next();
-    return res.status(403).sendFile('/public/error/401.html', { root: path.resolve(__dirname, '../../..') });
+    return res.redirect(`/proxyauth/error?error=403&redirect=${encodeURIComponent(req.originalUrl)}`);
 }
