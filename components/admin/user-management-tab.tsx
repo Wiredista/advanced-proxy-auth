@@ -92,6 +92,7 @@ export default function UserManagementTab() {
     }
     
     const newUser = await response.json()
+    newUser.created_at = new Date(newUser.created_at)
 
     setUsers([...users, newUser])
     setIsAddDialogOpen(false)
