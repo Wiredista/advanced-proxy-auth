@@ -32,51 +32,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-// Mock data - in a real app, this would come from your API
-const initialUsers = [
-  {
-    id: "1",
-    name: "John Doe",
-    username: "johndoe",
-    created: new Date("2023-01-15"),
-    lastSeen: new Date("2023-04-01T14:32:00"),
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    username: "janesmith",
-    created: new Date("2023-02-20"),
-    lastSeen: new Date("2023-04-01T09:15:00"),
-  },
-  {
-    id: "3",
-    name: "Robert Johnson",
-    username: "rjohnson",
-    created: new Date("2023-03-05"),
-    lastSeen: new Date("2023-03-30T16:45:00"),
-  },
-  {
-    id: "4",
-    name: "Emily Davis",
-    username: "emilyd",
-    created: new Date("2023-03-12"),
-    lastSeen: new Date("2023-03-31T11:20:00"),
-  },
-  {
-    id: "5",
-    name: "Michael Wilson",
-    username: "mwilson",
-    created: new Date("2023-03-18"),
-    lastSeen: new Date("2023-03-29T13:10:00"),
-  },
-]
-
 type User = {
   id: string
   name: string
   username: string
   created: Date
-  lastSeen: Date
 }
 
 type UserFormData = {
@@ -86,7 +46,7 @@ type UserFormData = {
 }
 
 export default function UserManagementTab() {
-  const [users, setUsers] = useState<User[]>(initialUsers)
+  const [users, setUsers] = useState<User[]>([])
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -96,36 +56,66 @@ export default function UserManagementTab() {
     password: "",
   })
 
-  const handleAddUser = () => {
+  const handleAddUser = async () => {
     // In a real app, you would call your API here
-    const newUser: User = {
-      id: (users.length + 1).toString(),
-      name: formData.name,
-      username: formData.username,
-      created: new Date(),
-      lastSeen: new Date(),
+    const response = await fetch("/api-proxyauth-admin/users", {
+      method: "POST",
+      body: JSON.stringify({
+        name: formData.name,
+        username: formData.username,
+        password: formData.password,
+      }),
+    })
+
+    if (!response.ok) {
+      alert("Failed to add user")
+      return
     }
+    
+    const newUser = await response.json()
 
     setUsers([...users, newUser])
     setIsAddDialogOpen(false)
     resetForm()
   }
 
-  const handleEditUser = () => {
+  const handleEditUser = async () => {
     if (!currentUser) return
 
     // In a real app, you would call your API here
-    const updatedUsers = users.map((user) =>
-      user.id === currentUser.id ? { ...user, name: formData.name, username: formData.username } : user,
-    )
+    const updatedUser = {
+      ...currentUser,
+      name: formData.name,
+      username: formData.username,
+    } 
 
+    const response = await fetch(`/api-proxyauth-admin/users/${currentUser.id}`, {
+      method: "PUT",
+      body: JSON.stringify({ ...updatedUser, password: formData.password }),
+    })
+
+    if (!response.ok) {
+      alert("Failed to update user")
+      return
+    }
+
+    const updatedUsers = users.map((user) => (user.id === currentUser.id ? updatedUser : user))
     setUsers(updatedUsers)
     setIsEditDialogOpen(false)
     resetForm()
   }
 
-  const handleDeleteUser = (userId: string) => {
+  const handleDeleteUser = async (userId: string) => {
     // In a real app, you would call your API here
+    const response = await fetch(`/api-proxyauth-admin/users/${userId}`, {
+      method: "DELETE",
+    })
+
+    if (!response.ok) {
+      alert("Failed to delete user")
+      return
+    }
+
     const updatedUsers = users.filter((user) => user.id !== userId)
     setUsers(updatedUsers)
   }
@@ -229,7 +219,6 @@ export default function UserManagementTab() {
                 <TableHead>Name</TableHead>
                 <TableHead>Username</TableHead>
                 <TableHead>Created</TableHead>
-                <TableHead>Last Seen</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -239,7 +228,6 @@ export default function UserManagementTab() {
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{format(user.created, "MMM d, yyyy")}</TableCell>
-                  <TableCell>{format(user.lastSeen, "MMM d, yyyy h:mm a")}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
