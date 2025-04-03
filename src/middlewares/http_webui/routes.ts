@@ -90,4 +90,9 @@ router.delete('/users/:id', (req, res) => {
     res.status(204).send();
 });
 
+router.get('/logout', (req, res) => {
+    res.clearCookie('proxyauth_session');
+    res.redirect('/');
+});
+
 export default router;

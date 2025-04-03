@@ -71,7 +71,7 @@ export default function AdminDashboard() {
           </SidebarContent>
           <SidebarFooter className="border-t p-4">
             <Button variant="outline" className="w-full justify-start" asChild>
-              <a href="/logout">
+              <a href="/api-proxyauth-admin/logout">
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </a>
