@@ -42,7 +42,7 @@ router.post('/users', (req, res) => {
 
     const hashedPassword = Bun.password.hashSync(password);
     const user = db.prepare('INSERT INTO users (username, password, name) VALUES (?, ?, ?)').run(username, hashedPassword, name);
-    res.json(user);
+    res.status(201).json({ id: user.lastInsertRowid, username, name, created_at: new Date() });
 });
 
 router.put('/users/:id', (req, res) => {
