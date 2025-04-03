@@ -33,7 +33,7 @@ export default function AdminDashboard() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-50 w-full">
         <Sidebar>
           <SidebarHeader className="border-b p-4">
             <div className="flex items-center gap-2">

@@ -253,7 +253,7 @@ export default function UserManagementTab() {
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.created_at.toLocaleDateString()}</TableCell>
+                  <TableCell>{user.created_at.toLocaleString()}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
