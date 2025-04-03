@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Edit, Trash, Plus } from "lucide-react"
 import { format } from "date-fns"
 
@@ -36,7 +36,7 @@ type User = {
   id: string
   name: string
   username: string
-  created: Date
+  created_at: Date
 }
 
 type UserFormData = {
@@ -55,6 +55,22 @@ export default function UserManagementTab() {
     username: "",
     password: "",
   })
+
+  useEffect(() => {
+    fetch("/api-proxyauth-admin/users")
+      .then((res) => res.json())
+      .then((data) => {
+        const parsedUsers = data.map((user: any) => ({
+          ...user,
+          created_at: new Date(user.created_at),
+        }))
+        setUsers(parsedUsers)
+      })
+      .catch((error) => {
+        console.error("Error fetching users:", error)
+      })
+  }, [])
+    
 
   const handleAddUser = async () => {
     // In a real app, you would call your API here
@@ -90,11 +106,18 @@ export default function UserManagementTab() {
       ...currentUser,
       name: formData.name,
       username: formData.username,
-    } 
+    } as any
+
+    if (formData.password) {
+      updatedUser.password = formData.password
+    }
 
     const response = await fetch(`/api-proxyauth-admin/users/${currentUser.id}`, {
       method: "PUT",
-      body: JSON.stringify({ ...updatedUser, password: formData.password }),
+      body: JSON.stringify(updatedUser),
+      headers: {
+        "Content-Type": "application/json",
+      },   
     })
 
     if (!response.ok) {
@@ -230,7 +253,7 @@ export default function UserManagementTab() {
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.username}</TableCell>
-                  <TableCell>{format(user.created, "MMM d, yyyy")}</TableCell>
+                  <TableCell>{user.created_at.toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
