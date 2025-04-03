@@ -53,7 +53,7 @@ export const httpWebUIAuthAdminMiddleware = (req: Request, res: Response, next: 
 export const loginRoute = (req: Request, res: Response) => {
     const { username, password, redirect } = req.body;
     const redirectURL = redirect || "/";
-    console.log(redirectURL);
+    
     if (!username || !password) {
         res.status(400).send('Bad Request');
         return;
