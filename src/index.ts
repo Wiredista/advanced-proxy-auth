@@ -24,7 +24,7 @@ app.all('/proxyauth*', (req: Request, res: Response) => {
 });
 
 // AUTHENTICATION MODES
-const AUTH_MODE = env.AUTH_MODE || 'none';
+const AUTH_MODE = env.AUTH_MODE || 'http_webui';
 
 if (AUTH_MODE === 'http_webui') {
     const { router } = require('./src/middlewares/http_webui');
