@@ -20,7 +20,7 @@ import LogsTab from "@/components/admin/logs-tab"
 import SettingsTab from "@/components/admin/settings-tab"
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("statistics")
+  const [activeTab, setActiveTab] = useState("users")
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -43,12 +43,12 @@ export default function AdminDashboard() {
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
-              <SidebarMenuItem>
+              {/* <SidebarMenuItem>
                 <SidebarMenuButton isActive={activeTab === "statistics"} onClick={() => setActiveTab("statistics")}>
                   <Home className="h-4 w-4" />
                   <span>Statistics</span>
                 </SidebarMenuButton>
-              </SidebarMenuItem>
+              </SidebarMenuItem> */}
               <SidebarMenuItem>
                 <SidebarMenuButton isActive={activeTab === "users"} onClick={() => setActiveTab("users")}>
                   <Users className="h-4 w-4" />
